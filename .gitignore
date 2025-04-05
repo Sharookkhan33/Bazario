@@ -1,0 +1,53 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+.DS_Store
+
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Logs
+logs/
+*.log
+log/
+debug.log
+error.log
+
+# Database & Cache
+*.sqlite
+*.sqlite3
+*.db
+*.pdb
+*.ldb
+*.ndb
+.mongod.lock
+dump/
+
+# Build & Compiled Files
+dist/
+build/
+out/
+coverage/
+
+# System Files
+Thumbs.db
+*.swp
+*.swo
+*.swn
+.idea/
+.vscode/
+*.bak
+*.tmp
+
+# Twilio Credentials (Sensitive Information)
+twilio.json
+
+# Ignore static & uploads (if storing on cloud)
+public/uploads/
+uploads/
