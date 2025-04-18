@@ -6,11 +6,13 @@ const {
   updateProduct,
   deleteProduct,
   toggleProductStatus,
+  searchProducts
 } = require("../controllers/productController");
 const { verifyVendor, authAdmin } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
+router.get("/",searchProducts);
 router.get("/all",getAllProducts);
 // Vendor Routes
 router.post("/add", verifyVendor, addProduct);

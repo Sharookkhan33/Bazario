@@ -9,6 +9,8 @@ const ProductSchema = new mongoose.Schema(
       stock: { type: Number, required: true },
       isActive: { type: Boolean, default: true },
       colour: { type: String },
+      averageRating: { type: Number, default: 0 }, // New field for avg rating
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
       rejectionMessage: { type: String, default: "" },// Optional field to connect products of different colors
       status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" }, // Admin approval for listing
     },

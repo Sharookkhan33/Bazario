@@ -115,4 +115,30 @@ exports.deleteProduct = async (req, res) => {
       res.status(400).json({ error: error.message });
     }
   };
+  //search and filtering
+  exports.searchProducts = async (req, res) => {
+    try {
+      const { search, category, minPrice, maxPrice, averageRating } = req.query;
+      const query = {};
   
+      if (search) {
+        query.name = { $regex: search, $options: "i" };
+      }
+      if (category) {
+        query.category = category;
+      }
+      if (minPrice || maxPrice) {
+        query.price = {};
+        if (minPrice) query.price.$gte = Number(minPrice);
+        if (maxPrice) query.price.$lte = Number(maxPrice);
+      }
+      if (averageRating) {
+        query.averageRating = { $gte: Number(averageRating) };
+      }
+  
+      const products = await Product.find(query);
+      res.status(200).json(products);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };

@@ -1,14 +1,18 @@
 const express = require("express");
-const { approveVendor, toggleVendorStatus,registerAdmin,verifyAdmin,loginAdmin} = require("../controllers/adminController");
+const { approveVendor, toggleVendorStatus,registerAdmin,verifyEmail,loginAdmin,deleteUser,getAllUsers,getAllVendors,getAdminDashboard} = require("../controllers/adminController");
 const { authAdmin } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
 router.post("/register", registerAdmin);
-router.post("/verify-admin", verifyAdmin);
+router.post("/verify-email", verifyEmail);
 router.post("/login", loginAdmin);
 router.put("/approve/:id",authAdmin, approveVendor);
 router.put("/toggle-status/:id",authAdmin, toggleVendorStatus);
-router
+router.get("/all-vendors", authAdmin, getAllVendors);
+router.delete("/delete-user/:id",authAdmin,deleteUser);
+router.get("/all-users", authAdmin, getAllUsers);
+router.get("/dashboard", authAdmin, getAdminDashboard);
+
 
 module.exports = router;

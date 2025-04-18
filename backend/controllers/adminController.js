@@ -1,9 +1,25 @@
 const Vendor = require("../models/Vendor");
 const Admin = require("../models/Admin");
-const { sendVerificationEmail } = require("../services/emailService");
+const User = require("../models/User");
+const Order = require("../models/Order");
+const Payment = require("../models/Payment")
+const { generateOTP, sendVerificationEmail } = require("../services/emailService");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+//Get all Vendors
+exports.getAllVendors = async (req, res) => {
+  try {
+      if (!req.admin) {
+          return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+
+      const vendors = await Vendor.find().select("-password");
+      res.status(200).json(vendors);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
 
 // Approve or Reject Vendor with a Rejection Message
 exports.approveVendor = async (req, res) => {
@@ -50,10 +66,9 @@ exports.toggleVendorStatus = async (req, res) => {
   }
 };
 
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 exports.registerAdmin = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email,phoneNumber, password } = req.body;
 
     // Check if admin already exists
     const existingAdmin = await Admin.findOne({ email });
@@ -64,15 +79,15 @@ exports.registerAdmin = async (req, res) => {
 
     // Generate OTP
     const emailOTP = generateOTP();
-
-
     // Create admin with OTP
     const admin = new Admin({
       name,
       email,
       password: hashedPassword,
+      phoneNumber,
       emailOTP,
-      isVerified: false,
+      emailVerified: false,
+      isVerified:false
     });
 
     await admin.save();
@@ -80,13 +95,13 @@ exports.registerAdmin = async (req, res) => {
     // Send OTP via email
     await sendVerificationEmail(email, emailOTP);
 
-    res.status(201).json({ message: "OTP sent to email. Please verify." });
+    res.status(201).json({ message: "OTP sent to email"});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.verifyAdmin = async (req, res) => {
+exports.verifyEmail = async (req, res) => {
   try {
     const { email, emailOTP } = req.body;
 
@@ -99,16 +114,17 @@ exports.verifyAdmin = async (req, res) => {
     }
 
     // Mark as verified
-    admin.isVerified = true;
+    admin.emailVerified = true;
     admin.emailOTP = null;
+    admin.isVerified = true;
+
     await admin.save();
 
-    res.status(200).json({ message: "Admin verified successfully" });
+    res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 // Admin Login
 exports.loginAdmin = async (req, res) => {
     try {
@@ -128,3 +144,61 @@ exports.loginAdmin = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+//Delete user
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// Get all Users
+exports.getAllUsers = async (req, res) => {
+  try {
+      if (!req.admin) {
+          return res.status(403).json({ message: "Access denied. Admin only." });
+      }
+
+      const users = await User.find().select("-password");
+      res.status(200).json(users);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
+//dash board
+exports.getAdminDashboard = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalVendors = await Vendor.countDocuments();
+    const totalOrders = await Order.countDocuments();
+    const totalPayments = await Payment.aggregate([
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    const totalEarnings = totalPayments[0]?.total || 0;
+    const orderTrends = await Order.aggregate([
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      totalUsers,
+      totalVendors,
+      totalOrders,
+      totalEarnings,
+      orderTrends,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+

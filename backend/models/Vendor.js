@@ -21,17 +21,27 @@ const VendorSchema = new mongoose.Schema(
           required: [true, "Password is required"],
           validate: {
             validator: function (value) {
+              // ✅ Only run this validation when the password is new or being updated
+              if (!this.isModified("password")) return true;
               return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
             },
             message:
               "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character",
           },
         },
+        
+        emailOTP: { type: String, required: false },
+    emailVerified: { type: Boolean, default: false },
+    isVerified: { 
+        type: Boolean, 
+        default: false 
+    },
     isActive: { type: Boolean, default: true },
     businessName: { type: String, required: true },
     businessAddress: { type: String, required: true },
     gstNumber: { type: String, unique: true }, 
     profilePhoto: { type: String },
+    stripeAccountId: { type: String },
 
 
     documents: [
