@@ -7,6 +7,8 @@ const VendorNavbar = () => {
     <nav className="bg-green-700 text-white p-4 flex justify-between items-center">
       <div className="text-lg font-bold">Vendor Dashboard</div>
       <div className="space-x-4">
+      <Link to="/vendors/orders" className="hover:underline">Order management</Link>
+      <Link to="/vendors/product-manage" className="hover:underline">Product mangement</Link>
         <Link to="/vendors/dashboard" className="hover:underline">Dashboard</Link>
         <Link to="/vendors/profile" className="hover:underline">My Account</Link>
         <button onClick={() => {

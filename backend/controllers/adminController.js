@@ -2,7 +2,8 @@ const Vendor = require("../models/Vendor");
 const Admin = require("../models/Admin");
 const User = require("../models/User");
 const Order = require("../models/Order");
-const Payment = require("../models/Payment")
+const Payment = require("../models/Payment");
+const Product = require("../models/Product")
 const { generateOTP, sendVerificationEmail } = require("../services/emailService");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -68,7 +69,17 @@ exports.toggleVendorStatus = async (req, res) => {
 
 exports.registerAdmin = async (req, res) => {
   try {
-    const { name, email,phoneNumber, password } = req.body;
+    const { name, email,phoneNumber, password,secretKey} = req.body;
+    
+
+     if (secretKey != process.env.ADMIN_SECRET_KEY) {
+      console.log(secretKey)
+      console.log(process.env.ADMIN_SECRET_KEY)
+     return res.status(403).json({ message: "Unauthorized" });
+     }
+     else{
+      console.log("authorized")
+     }
 
     // Check if admin already exists
     const existingAdmin = await Admin.findOne({ email });

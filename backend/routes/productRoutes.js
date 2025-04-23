@@ -1,9 +1,12 @@
 const express = require("express");
+const productUpload = require("../middlewares/productUploads");
 const {
   addProduct,
   getAllProducts,
+  getProductById,
   updateProductStatus,
   updateProduct,
+  getVendorProducts,
   deleteProduct,
   toggleProductStatus,
   searchProducts
@@ -13,10 +16,13 @@ const { verifyVendor, authAdmin } = require("../middlewares/authMiddleware");
 const router = express.Router();
 
 router.get("/",searchProducts);
+router.get("/get/:id",getProductById);
 router.get("/all",getAllProducts);
+
 // Vendor Routes
-router.post("/add", verifyVendor, addProduct);
-router.put("/update/:id", verifyVendor, updateProduct);
+router.post("/add", verifyVendor, productUpload.single("image"), addProduct);
+router.put('/update/:id', verifyVendor, productUpload.single("image"), updateProduct);
+router.get("/vendor", verifyVendor, getVendorProducts);
 router.delete("/delete/:id", verifyVendor, deleteProduct);
 router.put("/toggle-status/:id", verifyVendor, toggleProductStatus);
 

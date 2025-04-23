@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import api from "../api/axios";
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
@@ -28,7 +28,7 @@ const UserRegister = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/register', formData);
+      const response = await api.post('/users/register', formData);
       localStorage.setItem('token', response.data.token); // optional
       login(response.data.token); // ✅ update auth context
       alert("Registration successful!");

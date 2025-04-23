@@ -1,14 +1,14 @@
 // src/pages/VendorLogin.jsx
 import React, { useState,useContext} from 'react';
-import axios from 'axios';
+import api from "../../api/axios"
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { useToast } from '../../context/ToastContext';
+import toast from 'react-hot-toast';
+
 
 
 const VendorLogin = () => {
-  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -17,18 +17,18 @@ const VendorLogin = () => {
   const handleVendorLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/vendors/login', {
+      const response = await api.post('/vendors/login', {
         email,
         password,
       });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userType', 'vendor'); // 👈 add thisT
       login(response.data.token); 
-      showToast("Loggin Successul")
+      toast.success("Loggin Successul")
       navigate('/vendors/dashboard');// Adjust this route based on your app
     } catch (error) {
-      showToast('Login failed', error);
-      showToast('Login failed. Please check your credentials.',error);
+      toast.error('Login failed', error);
+      toast.error('Login failed. Please check your credentials.',err);
     }
   };
 

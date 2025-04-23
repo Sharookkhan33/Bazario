@@ -1,12 +1,30 @@
 const Product = require("../models/Product");
+const mongoose = require("mongoose");
+
 
 // Add a new product
 exports.addProduct = async (req, res) => {
   try {
-    const product = new Product({...req.body, vendor: req.vendor.id});
+    let image;
+
+    if (req.file) {
+      image = `${req.protocol}://${req.get("host")}/uploads/products/${req.file.filename}`;
+    } else if (req.body.image) {
+      image = req.body.image;
+    } else {
+      return res.status(400).json({ message: "Image is required" });
+    }
+
+    const product = new Product({
+      ...req.body,
+      vendor: req.vendor.id,
+      image, // 👈 assign image here
+    });
+
     await product.save();
     res.status(201).json({ message: "Product added successfully", product });
   } catch (error) {
+    console.error("Add Product Error:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -20,6 +38,29 @@ exports.getAllProducts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Get single product by ID
+exports.getProductById = async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  try {
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({ product });
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 // Update Product status (Approve/Reject)
 exports.updateProductStatus = async (req, res) => {
@@ -53,17 +94,36 @@ exports.updateProductStatus = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+exports.getVendorProducts = async (req, res) => {
+  try {
+    
+    const vendorId = req.vendor.id;
+    
+    const products = await Product.find({ vendor: vendorId });
+
+    res.status(200).json({ products });
+  } catch (error) {
+    console.error("Error fetching vendor products:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 // Update product details
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findOne({ _id: id, vendor: req.vendor.id }); // Ensure vendor owns the product
+    const product = await Product.findOne({ _id: id, vendor: req.vendor.id });
     if (!product) return res.status(404).json({ message: "Product not found or unauthorized" });
+
+    // Handle image if new one is uploaded
+    if (req.file) {
+      req.body.image = `${req.protocol}://${req.get("host")}/uploads/products/${req.file.filename}`;
+    }
 
     Object.assign(product, req.body);
     await product.save();
+
     res.status(200).json({ message: "Product updated successfully", product });
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import ProductCard from '../components/ProductCard';
+import api from "../api/axios"
+import ProductCard from '../components/ui/ProductCard';
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
@@ -8,7 +8,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');  // Update with your API endpoint
+        const response = await api.get('/products');  // Update with your API endpoint
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products', error);

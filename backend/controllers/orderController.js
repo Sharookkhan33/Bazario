@@ -68,8 +68,9 @@ exports.getOrdersByVendor = async (req, res) => {
   try {
     const vendorId = req.vendor.id; 
     const orders = await Order.find({ 'items.vendor': vendorId })
-      .populate('items.product', 'name price') 
+    .populate('items.product') 
       .exec();
+      console.log("Orders fetched:", JSON.stringify(orders, null, 2));
 
     if (orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this vendor.' });

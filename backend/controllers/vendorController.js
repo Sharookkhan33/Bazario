@@ -118,7 +118,9 @@ exports.loginVendor = async (req, res) => {
   }
 };
 
-// Update Vendor
+ 
+
+// Update Vendor Profile
 exports.updateVendor = async (req, res) => {
   try {
     const vendorId = req.vendor.id;
@@ -140,10 +142,10 @@ exports.updateVendor = async (req, res) => {
       },
     };
 
-    // ✅ If a file is uploaded, normalize its path and add to updates
+    // ✅ Save profile photo path from "uploads/profiles"
     if (req.file) {
       const filename = req.file.filename;
-      const photoPath = path.join('uploads', filename).replace(/\\/g, '/');
+      const photoPath = path.join('uploads/profiles', filename).replace(/\\/g, '/');
       updates.profilePhoto = photoPath;
     }
 
@@ -158,6 +160,7 @@ exports.updateVendor = async (req, res) => {
     res.status(500).json({ message: "Failed to update profile" });
   }
 };
+
 
 //Vendor Profile
 

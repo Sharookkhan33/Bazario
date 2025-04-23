@@ -13,6 +13,9 @@ exports.verifyVendor = async (req, res, next) => {
     const vendor = await Vendor.findById(decoded.id);
     if (!vendor) return res.status(403).json({ message: "Access denied - Vendor not found" });
 
+    if (vendor.status === 'rejected' || !vendor.isActive) {
+      return res.status(403).json({ message: 'Your account is suspended. Please contact admin.' });
+    }
     // Store admin info in request
     req.vendor= vendor;
 

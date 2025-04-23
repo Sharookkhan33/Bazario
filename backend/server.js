@@ -22,7 +22,10 @@ dotenv.config();
 const app =express();
 
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // 👈 specify your frontend URL
+    credentials: true,               // 👈 allow credentials (cookies, auth headers)
+  }));
 app.use(express.json())
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/invoices", express.static(path.join(__dirname, "invoices")));

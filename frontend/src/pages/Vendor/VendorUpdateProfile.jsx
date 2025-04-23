@@ -2,32 +2,33 @@
 
 // src/pages/Vendor/VendorUpdateProfile.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../../api/axios"
 
 const VendorUpdateProfile = () => {
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', profilePhoto: '',
+    name: '', phone: '', profilePhoto: '',
     businessName: '', businessAddress: '', gstNumber: '',
     accountHolderName: '', bankName: '', accountNumber: '', ifscCode: ''
   });
+  const [email, setEmail] = useState('');
   const [file, setFile] = useState(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/vendors/profile', {
+        const res = await api.get('/vendors/profile', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         const v = res.data;
         setFormData({
-          name: v.name, email: v.email, phone: v.phone,
-          profilePhoto: v.profilePhoto,
+          name: v.name, phone: v.phone,
           businessName: v.businessName, businessAddress: v.businessAddress, gstNumber: v.gstNumber,
-          accountHolderName: v.bankDetails.accountHolderName,
-          bankName: v.bankDetails.bankName,
-          accountNumber: v.bankDetails.accountNumber,
-          ifscCode: v.bankDetails.ifscCode
+          accountHolderName: v.bankDetails?.accountHolderName || '',
+          bankName: v.bankDetails?.bankName || '',
+          accountNumber: v.bankDetails?.accountNumber || '',
+          ifscCode: v.bankDetails?.ifscCode || '',
         });
+        setEmail(v.email);
       } catch (err) {
         console.error(err);
       }
@@ -42,13 +43,13 @@ const VendorUpdateProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
-    for (let key in formData) {
-      data.append(key, formData[key]);
-    }
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value);
+    });
     if (file) data.append('profilePhoto', file);
 
     try {
-      const res = await axios.put(`http://localhost:5000/api/vendors/update`, data, {
+      const res = await api.put(`/vendors/update`, data, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'multipart/form-data'
@@ -65,7 +66,7 @@ const VendorUpdateProfile = () => {
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md space-y-4">
       <h2 className="text-2xl font-bold mb-4">Update Vendor Profile</h2>
       <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" className="input" />
-      <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="input" />
+      <input type="email" name="email" value={email} disabled className="input bg-gray-100" />
       <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" className="input" />
 
       <h3 className="font-semibold mt-4">Business Details</h3>

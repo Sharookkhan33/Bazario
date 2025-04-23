@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../../api/axios"
 import { useNavigate } from 'react-router-dom';
 
 const VendorProfile = () => {
@@ -12,7 +12,7 @@ const VendorProfile = () => {
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/vendors/profile', {
+      const res = await api.get('/vendors/profile', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setVendor(res.data);
@@ -23,8 +23,8 @@ const VendorProfile = () => {
 
   const toggleStatus = async () => {
     try {
-      const res = await axios.put(
-        'http://localhost:5000/api/vendors/status', // ✅ Corrected endpoint
+      const res = await api.put(
+        '/vendors/status', // ✅ Corrected endpoint
         {},
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },

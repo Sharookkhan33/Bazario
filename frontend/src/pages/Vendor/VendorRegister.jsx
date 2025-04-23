@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../api/axios"
+import toast from 'react-hot-toast';
 
 const VendorRegister = () => {
   const navigate = useNavigate();
@@ -52,50 +53,50 @@ const VendorRegister = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      return setMessage("❌ Passwords do not match");
+      return toast.error("❌ Passwords do not match");
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/vendors/register", formData);
-      setMessage("✅ OTP sent to your email");
+      const res = await api.post("/vendors/register", formData);
+      toast.success("✅ OTP sent to your email");
       setEmail(formData.email);
       setOtpPhase(true);
     } catch (error) {
       console.error("Register error:", error.response?.status, error.response?.data);
-      setMessage(error.response?.data?.message || "Something went wrong");
+      toast.success(error.response?.data?.message || "Something went wrong");
     }
   };
 
   const verifyOtp = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/vendors/verify-email", {
+      const res = await api.post("/vendors/verify-email", {
         email,
         emailOTP: otp,
       });
 
       localStorage.removeItem("vendorForm");
-      setMessage("✅ Email verified!");
+      toast.success("✅ Email verified!");
       navigate("/vendor/success");
     } catch (error) {
       setMessage(error.response?.data?.message || "OTP verification failed");
     }
   };
 
-  const resendOtp = async () => {
-    try {
-      const res = await axios.post("http://localhost:5000/api/vendors/resend-otp", {
-        email,
-      });
-      setMessage(res.data.message);
-    } catch (error) {
-      const errMsg = error.response?.data?.message || "Resend OTP failed";
-      setMessage(errMsg);
-      console.error("Resend OTP error:", error); // helps debugging
-    }
-  };
+  
+const resendOtp = async () => {
+  try {
+    const res = await api.post("/vendors/resend-otp", {
+      email,
+    });
+    toast.success(res.data.message); // ✅ Show success toast
+  } catch (error) {
+    const errMsg = error.response?.data?.message || "Resend OTP failed";
+    toast.error(errMsg); // ✅ Show error toast
+    console.error("Resend OTP error:", error); // optional debug log
+  }
+};
   
   
-
   return (
     <div className="min-h-screen bg-[#f1f3f6] flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-3xl p-8 rounded-lg shadow-md border border-blue-100">
