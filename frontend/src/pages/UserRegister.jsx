@@ -29,8 +29,9 @@ const UserRegister = () => {
 
     try {
       const response = await api.post('/users/register', formData);
-      localStorage.setItem('token', response.data.token); // optional
-      login(response.data.token); // ✅ update auth context
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userType', 'user'); // optional
+      login(response.data.token,'user'); // ✅ update auth context
       alert("Registration successful!");
       navigate('/'); // redirect to home
     } catch (error) {

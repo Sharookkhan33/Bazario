@@ -3,13 +3,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
-  const { isLoggedIn, logout } = useContext(AuthContext);
+  const { isLoggedIn, userType, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const authRoutes = [
@@ -30,19 +30,34 @@ const Navbar = () => {
 
       {!showOnlyLogo && (
         <div className="space-x-4">
-          {!isLoggedIn && !isAuthPage ? (
+          {!isLoggedIn && !isAuthPage && (
             <>
               <Link to="/login" className="text-blue-600 font-medium">Login</Link>
               <Link to="/register" className="text-blue-600 font-medium">Register</Link>
               <Link to="/vendor-login" className="text-blue-600 font-medium">Become Seller</Link>
             </>
-          ) : null}
+          )}
 
-          {isLoggedIn && (
+          {isLoggedIn && userType === "user" && (
             <>
               <Link to="/cart">🛒 Cart</Link>
               <Link to="/wishlist">❤️ Wishlist</Link>
               <Link to="/account">👤 My Account</Link>
+              <button onClick={handleLogout} className="ml-4 text-red-600">Logout</button>
+            </>
+          )}
+
+          {isLoggedIn && userType === "vendor" && (
+            <>
+              <Link to="/vendors/dashboard">📦 Dashboard</Link>
+              <Link to="/vendors/profile">👤 Profile</Link>
+              <button onClick={handleLogout} className="ml-4 text-red-600">Logout</button>
+            </>
+          )}
+
+          {isLoggedIn && userType === "admin" && (
+            <>
+              <Link to="/admin-dashboard">📊 Admin Dashboard</Link>
               <button onClick={handleLogout} className="ml-4 text-red-600">Logout</button>
             </>
           )}
@@ -53,5 +68,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-

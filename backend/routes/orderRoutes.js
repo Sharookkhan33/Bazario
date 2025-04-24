@@ -1,6 +1,6 @@
 const express = require("express");
-const { placeOrder, getOrdersByUser, getOrdersByVendor, updateOrderStatus } = require("../controllers/orderController");
-const { verifyUser,verifyVendor,verifyVendorOrAdmin } = require("../middlewares/authMiddleware"); 
+const { placeOrder, getOrdersByUser, getOrdersByVendor, updateOrderStatus ,getAllOrders} = require("../controllers/orderController");
+const { verifyUser,verifyVendor,verifyVendorOrAdmin, authAdmin } = require("../middlewares/authMiddleware"); 
 
 const router = express.Router();
 
@@ -15,5 +15,8 @@ router.get("/vendor-orders", verifyVendor, getOrdersByVendor);
 
 // Update order status (Vendor/Admin)
 router.put("/update-status/:orderId", verifyVendorOrAdmin, updateOrderStatus);
+
+// Get all orders (Admin only)
+router.get("/all", authAdmin, getAllOrders);
 
 module.exports = router;

@@ -34,19 +34,23 @@ const VendorManagement = () => {
       console.error(err);
     }
   };
-
   const handleToggleStatus = async (id) => {
     try {
-      await api.put(`/admin/toggle-status/${id}`,{
-        headers: {
+      await api.put(
+        `/admin/toggle-status/${id}`,
+        {}, // Empty body since you're not sending data
+        {
+          headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-      });
-      fetchVendors();
+        }
+      );
+      fetchVendors(); // Refresh list after toggling status
     } catch (err) {
       console.error(err);
     }
   };
+  
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">

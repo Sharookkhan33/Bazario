@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema(
       type: AddressSchema,
       required: false, // ✅ Better than `default: null`
     },
-
+    suspended: { type: Boolean, default: false },
     password: {
       type: String,
       required: [true, "Password is required"],

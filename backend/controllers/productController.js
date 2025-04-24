@@ -201,4 +201,50 @@ exports.deleteProduct = async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
+  };                
+  exports.getAllProductsForAdmin = async (req, res) => {
+    try {
+      const { status, isActive, category, vendor, search } = req.query;
+      const query = {};
+  
+      if (status) query.status = status;
+      if (isActive) query.isActive = isActive === "true";
+      if (category) query.category = category;
+      if (vendor) query.vendor = vendor;
+      if (search) query.name = { $regex: search, $options: "i" };
+  
+      const products = await Product.find(query)
+        .populate("vendor", "name email")
+        .sort({ createdAt: -1 });
+  
+      res.status(200).json(products);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   };
+  
+  exports.getSingleProduct = async (req, res) => {
+    try {
+      const product = await Product.findById(req.params.id)
+        .populate("vendor", "name email")
+        .populate("reviews");
+  
+      if (!product) return res.status(404).json({ message: "Product not found" });
+  
+      res.status(200).json(product);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
+
+  exports.updateProductByAdmin = async (req, res) => {
+    try {
+      const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+      if (!product) return res.status(404).json({ message: "Product not found" });
+  
+      res.status(200).json({ message: "Product updated", product });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  };
+  

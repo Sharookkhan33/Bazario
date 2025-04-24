@@ -17,12 +17,14 @@ const UserLogin = () => {
         password,
       });
 
-      localStorage.setItem('token', response.data.token); // optional (if needed elsewhere)
-      login(response.data.token); // ✅ Update context
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userType', 'user'); // optional
+      login(response.data.token,'user');
       navigate('/'); // ✅ Redirect
     } catch (error) {
       console.error('Login failed', error);
-      alert('Login failed. Please check your credentials.');
+      alert(error.response?.data?.message || 'Login failed. Please check your credentials.');
+
     }
   };
 

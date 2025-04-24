@@ -1,20 +1,30 @@
-// src/pages/Vendor/VendorDashboard.jsx
 import React, { useEffect, useState } from 'react';
-import api from "../../api/axios"
+import { useNavigate } from 'react-router-dom';
+import api from "../../api/axios";
 
 const VendorDashboard = () => {
   const [dashboard, setDashboard] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboard = async () => {
-      const token = localStorage.getItem('token');
-      const res = await api.get('/vendors/dashboard', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setDashboard(res.data);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await api.get('/vendors/dashboard', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setDashboard(res.data);
+
+        // Replace current history entry to prevent going back
+        navigate('/vendors/dashboard', { replace: true });
+      } catch (error) {
+        console.error("Error fetching dashboard:", error);
+        navigate('/vendor-login'); // fallback if unauthorized or error
+      }
     };
+
     fetchDashboard();
-  }, []);
+  }, [navigate]);
 
   if (!dashboard) return <p className="text-center mt-10">Loading dashboard...</p>;
 

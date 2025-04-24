@@ -23,9 +23,9 @@ const VendorLogin = () => {
       });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userType', 'vendor'); // 👈 add thisT
-      login(response.data.token); 
+      login(response.data.token, 'vendor'); // ✅ pass token AND userType
       toast.success("Loggin Successul")
-      navigate('/vendors/dashboard');// Adjust this route based on your app
+      navigate('/vendors/dashboard', { replace: true });// Adjust this route based on your app
     } catch (error) {
       toast.error('Login failed', error);
       toast.error('Login failed. Please check your credentials.',err);

@@ -111,7 +111,12 @@ exports.loginVendor = async (req, res) => {
     const isMatch = await comparePassword(password, vendor.password);
 
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-    const token = jwt.sign({ id: vendor._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign(
+      { id: vendor._id, userType: 'vendor' },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+    
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -3,11 +3,14 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
+import UserRoute from './routes/UserRoute';
+import UserLayout from './layouts/UserLayout';
 import UserLogin from './pages/UserLogin';
 import UserRegister from './pages/UserRegister';
 import VendorLogin from './pages/Vendor/VendorLogin';
 import VendorRegister from './pages/Vendor/VendorRegister';
 import VendorSuccess from './pages/Vendor/VendorSuccess';
+import VendorRejected from './pages/Vendor/VendorRejected';
 import VendorDashboard from './pages/Vendor/VendorDashboard';
 import VendorProfile from './pages/Vendor/VendorProfile';
 import VendorUpdateProfile from './pages/Vendor/VendorUpdateProfile';
@@ -23,7 +26,11 @@ import AdminRegister from './pages/Admin/AdminRegister';
 import AdminVerify from "./pages/Admin/AdminVerify";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
-import VendorManagement from './pages/Admin/VendorMangement';
+import AdminVendorManagement from './pages/Admin/AdminVendorMangement';
+import AdminUserManagement from './pages/Admin/AdminUserManagement';
+import PublicRoute from './routes/PublicRoute';
+import AdminProductManagement from './pages/Admin/ProductManagement';
+import AdminOrderManagement from './pages/Admin/AdminOrderMAngement';
 
 const App = () => {
   return (
@@ -32,14 +39,16 @@ const App = () => {
       <Routes>
 
         <Route path="/" element={<><Navbar /><HomePage /></>}/>
-        <Route path="/login" element={<><Navbar /><UserLogin /></>}/>
+        <Route path="/login" element={<><Navbar /><PublicRoute/><UserLogin /></>}/>
         <Route path="/register"element={<><Navbar /><UserRegister /></>}/>
-        <Route path="/vendor-login" element={<><Navbar /><VendorLogin/> </>} />
+        <Route path="/vendor-login" element={<><Navbar /><PublicRoute/><VendorLogin/> </>} />
         <Route path="/vendor-register" element={<><Navbar /><VendorRegister/> </>} />
         <Route path="/vendor/success" element={<><Navbar /><VendorSuccess/> </>} />
         <Route path="/admin-register" element={<><Navbar/><AdminRegister /></>} />
         <Route path="/admin-verify" element={<><Navbar/><AdminVerify /></>} />
         <Route path="/admin-login" element={<><Navbar/><AdminLogin /></>} />
+        <Route path="/vendor-rejected" element={<VendorRejected />} />
+
 
         {/* Protected Vendor Panel routes */}
         <Route element={<VendorRoute />}>
@@ -56,11 +65,20 @@ const App = () => {
         <Route element={<AdminRoute />}>
           <Route element={<AdminLayout />}>
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/admin-vendors" element={<VendorManagement/>}/>
+            <Route path="/admin-vendors" element={<AdminVendorManagement/>}/>
+            <Route path="/admin-users" element={<AdminUserManagement/>}/>
+            <Route path="/admin-products" element={<AdminProductManagement/>}/>
+            <Route path="/admin-orders" element={<AdminOrderManagement/>}/>
 
           </Route>
         </Route>
-
+        
+        <Route element={<UserRoute />}>
+        <Route element={<UserLayout />}>
+        
+        
+        </Route>
+      </Route>
       </Routes>
     </>
   );

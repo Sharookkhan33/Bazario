@@ -98,10 +98,27 @@ exports.updateOrderStatus = async (req, res) => {
     if (!order) return res.status(404).json({ message: "Order not found" });
     if(order.paymentStatus=="pending") return res.status(400).json({message:"Payment is pending"})
     order.status = status;
+    order.statusHistory.push({ status });
+    
     await order.save();
 
     res.status(200).json({ message: `Order status updated to ${status}`, order });
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const { status, page = 1, limit = 10 } = req.query;
+    const query = status ? { status } : {};
+    const orders = await Order.find(query)
+      .populate("user")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
