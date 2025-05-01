@@ -7,7 +7,7 @@ exports.getCart = async (req, res) => {
 
     const cart = await Cart.findOne({ user: userId }).populate("items.product");
 
-    if (!cart) return res.status(404).json({ message: "Cart is empty" });
+    if (!cart) return res.status(400).json({ message: "Cart is empty" });
 
     res.status(200).json(cart);
   } catch (error) {

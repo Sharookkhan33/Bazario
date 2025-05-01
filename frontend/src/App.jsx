@@ -63,7 +63,7 @@ const App = () => {
         <Route path="/admin-login" element={<><Navbar/><AdminLogin /></>} />
         <Route path="/vendor-rejected" element={<VendorRejected />} />
         <Route path="/products" element={<><Navbar /><PublicRoute/><ProductsByCategoryPage/> </>} />
-        <Route path="/product/:id" element={<><Navbar /><PublicRoute/><ProductDetailsPage/> </>} />
+        <Route path="/product/:id" element={<><Navbar /><ProductDetailsPage/> </>} />
         <Route path="/" element={<><PublicRoute/><LandingPage /></>} />
         <Route path="/vendor-home" element={<><PublicRoute/><VendorLandingPage/></>}/>
         <Route path="/about" element={<AboutUs />} />
