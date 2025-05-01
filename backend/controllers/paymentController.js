@@ -71,6 +71,14 @@ exports.confirmPayment = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
+        // Instead of calculating the discount again, use the totalAmount saved in the order
+        const totalDiscount = order.items.reduce((acc, item) => {
+          const discountAmount = item.discount ? (item.price * item.discount) / 100 : 0;
+          return acc + discountAmount * item.quantity;
+        }, 0);
+    
+        const discountedPrice = order.totalAmount; 
+
     // Update order status
     order.status = "processing";
     order.paymentStatus = "paid";
@@ -85,11 +93,15 @@ exports.confirmPayment = async (req, res) => {
       currency: session.currency,
       status: session.payment_status,
       paymentIntent: session.payment_intent,
+      discountApplied: totalDiscount,
     });
 
     // ✅ Generate invoice PDF
-    const filepath = path.join(__dirname, "../invoices", `Invoice-${order._id}.pdf`);
-    await generateInvoice(order, payment, filepath);
+    const cloudUrl = await generateInvoice(order, payment);  // This generates the invoice and gets the Cloudinary URL
+
+    // Save the invoice URL in the Payment document
+    payment.invoiceUrl = cloudUrl;
+    await payment.save();  // Don't forget to save the updated payment
 
     // ✅ Send invoice via email
     const email = req.user.email;
@@ -101,7 +113,7 @@ exports.confirmPayment = async (req, res) => {
         attachments: [
           {
             filename: `Invoice-${order._id}.pdf`,
-            path: filepath,
+            path: cloudUrl,  // Using the Cloudinary URL
           },
         ],
       });
@@ -114,5 +126,16 @@ exports.confirmPayment = async (req, res) => {
   } catch (error) {
     console.error("Payment confirmation error:", error);
     res.status(500).json({ error: error.message });
+  }
+};
+
+// controllers/paymentController.js
+exports.getMyPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json(payments);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Could not fetch payments" });
   }
 };

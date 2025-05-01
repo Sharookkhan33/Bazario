@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
-const ProductForm = ({ initialData = {}, onSubmit }) => {
+const ProductForm = ({ initialData = {}, onSubmit, mode = "add" }) => {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
     category: '',
     description: '',
     stock: '',
+    discount:'',
+    isFeatured:'',
+    tags:'',
     image: '',
   });
 
@@ -59,6 +62,37 @@ const ProductForm = ({ initialData = {}, onSubmit }) => {
         <input name="stock" type="number" value={formData.stock} onChange={handleChange}
                className="w-full border rounded px-3 py-2" required />
       </div>
+      {/* Discount */}
+<input
+  type="number"
+  name="discount"
+  value={formData.discount}
+  onChange={handleChange}
+  placeholder="Discount %"
+/>
+
+{/* Sold - (optional, admin can manage separately) */}
+
+{/* Is Featured */}
+<label>
+  <input
+    type="checkbox"
+    name="isFeatured"
+    checked={formData.isFeatured}
+    onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+  />
+  Featured Product
+</label>
+
+{/* Tags */}
+<input
+  type="text"
+  name="tags"
+  value={formData.tags}
+  onChange={(e) => setFormData({ ...formData, tags: e.target.value.split(",") })}
+/>
+<p className="text-sm text-gray-500">Enter tags separated by comma: Trending,Hot,Limited Edition</p>
+
       <div>
   <label className="block font-semibold mb-1">Product Image</label>
   
@@ -81,9 +115,13 @@ const ProductForm = ({ initialData = {}, onSubmit }) => {
 </div>
 
 
-      <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-        {initialData._id ? 'Update Product' : 'Add Product'}
-      </button>
+<button
+  type="submit"
+  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+>
+  {mode === 'edit' ? 'Update Product' : 'Add Product'}
+</button>
+
     </form>
   );
 };

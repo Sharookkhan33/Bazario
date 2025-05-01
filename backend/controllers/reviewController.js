@@ -74,16 +74,19 @@ exports.addReview = async (req, res) => {
   exports.getReviews = async (req, res) => {
     try {
       const { productId } = req.params;
+  
       const reviews = await Review.find({ product: productId })
-        .populate("user", "name")
-        .select("rating comment productImage createdAt"); // Include product image
-      
+        .populate("user", "name") // populate only 'name' from User model
+        .select("rating comment productImage createdAt user") // also select 'user' field!
+        .sort({ createdAt: -1 }); // (optional) newest first
+  
       res.status(200).json(reviews);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error(error);
+      res.status(500).json({ error: "Could not fetch reviews" });
     }
   };
-
+  
 // Edit a review
 exports.editReview = async (req, res) => {
   try {
@@ -129,5 +132,17 @@ exports.deleteReview = async (req, res) => {
     res.status(200).json({ message: "Review deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getMyReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find({ user: req.user.id })
+      .populate("product", "name image")
+      .sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Could not fetch your reviews" });
   }
 };

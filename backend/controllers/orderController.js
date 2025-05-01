@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const Product = require("../models/Product");
 const User = require("../models/User")
 
+// controllers/orderController.js
 exports.placeOrder = async (req, res) => {
   try {
     const { items, shippingAddress } = req.body;
@@ -15,37 +16,41 @@ exports.placeOrder = async (req, res) => {
     // Fetch product details and calculate total amount
     const orderItems = await Promise.all(
       items.map(async (item) => {
-        const product = await Product.findById(item.product).populate("vendor"); // ✅ Fixed
+        const product = await Product.findById(item.product).populate("vendor");
         if (!product) throw new Error(`Product not found: ${item.product}`);
 
-        const subtotal = product.price * item.quantity;
-        totalAmount += subtotal;
+        const priceAfterDiscount = product.discount
+          ? (product.price - (product.price * product.discount) / 100).toFixed(2)
+          : product.price.toFixed(2);
+
+        const subtotal = priceAfterDiscount * item.quantity;
+        totalAmount += parseFloat(priceAfterDiscount) * item.quantity;
 
         return {
           product: product._id,
-          vendor: product.vendor._id, // ✅ Store vendor per item
+          vendor: product.vendor._id,
           name: product.name,
-          price: product.price,
+          price: priceAfterDiscount, // Store the price after discount
           quantity: item.quantity,
-          subtotal
+          subtotal: subtotal,
+          discount: product.discount, // Store the discount in the order item
         };
       })
     );
-    
 
     // Create order
     const order = new Order({
       user: req.user.id,
       items: orderItems,
-      totalAmount,
-      status: "pending"
+      totalAmount: totalAmount.toFixed(2), // Ensure total amount is saved as a fixed value
+      status: "pending",
     });
 
     if (shippingAddress !== req.user.shippingAddress) {
       req.user.shippingAddress = shippingAddress;
       await req.user.save();
     }
-        
+
     await order.save();
     res.status(201).json({ message: "Order placed successfully", order });
   } catch (error) {
@@ -53,10 +58,14 @@ exports.placeOrder = async (req, res) => {
   }
 };
 
+
+
 // Get Orders by User
 exports.getOrdersByUser = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user.id }).populate("items");
+    const orders = await Order.find({ user: req.user.id }).populate("items")
+    .populate("items.product", "name image")
+    .sort({ createdAt: -1 });
     res.status(200).json(orders);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -70,7 +79,6 @@ exports.getOrdersByVendor = async (req, res) => {
     const orders = await Order.find({ 'items.vendor': vendorId })
     .populate('items.product') 
       .exec();
-      console.log("Orders fetched:", JSON.stringify(orders, null, 2));
 
     if (orders.length === 0) {
       return res.status(404).json({ message: 'No orders found for this vendor.' });

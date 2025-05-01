@@ -10,10 +10,10 @@ const productRoutes = require("./routes/productRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const orderRoutes= require("./routes/orderRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
-const cartroutes = require("./routes/cartRoutes")
-const reviewroutes = require("./routes/reviewRoutes")
-
-
+const cartroutes = require("./routes/cartRoutes");
+const reviewroutes = require("./routes/reviewRoutes");
+const bannerroutes = require("./routes/bannerRoutes");
+const categoryRoutes= require("./routes/categoryRoutes")
 const multer = require("multer");
 
 const connectDB =require('./config/db');
@@ -44,6 +44,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/cart",cartroutes);
 app.use("/api/review",reviewroutes);
+app.use("/api/banners",bannerroutes);
+app.use("/api/categories",categoryRoutes)
 app.use("/api/payments", require("./routes/paymentRoutes"));
 
 const PORT=process.env.PORT||5000

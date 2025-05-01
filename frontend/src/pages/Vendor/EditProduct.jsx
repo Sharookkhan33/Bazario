@@ -1,14 +1,14 @@
-// src/pages/Vendor/EditProduct.jsx
 import React, { useEffect, useState } from 'react';
 import api from "../../api/axios"
 import { useParams, useNavigate } from 'react-router-dom';
 import ProductForm from '../../components/ui/ProductForm';
+import {Loader2} from '../../components/Loader';
 
 const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [initialData, setInitialData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -17,7 +17,10 @@ const EditProduct = () => {
         const res = await api.get(`/products/get/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setInitialData(res.data.product); // assuming your backend returns { product: { ... } }
+
+        // Remove _id and reviews (and any other unneeded fields if necessary)
+        const { _id, reviews, ...cleanedProduct } = res.data.product;
+        setInitialData(cleanedProduct);
         setLoading(false);
       } catch (err) {
         console.error('Fetch Product Error:', err);
@@ -27,51 +30,47 @@ const EditProduct = () => {
     fetchProduct();
   }, [id, token]);
 
-  const handleUpdateProduct = async (updatedData) => {
+  const handleUpdateProduct = async (formData) => {
+    setLoading(true);
+
     try {
-      const formData = new FormData();
-  
-      // Check if the image is a File (uploaded by user)
-      const isFile = updatedData.image instanceof File;
-  
-    if (formData.image instanceof File) {
-        formData.append("image", formData.image);
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("price", formData.price);
+      data.append("category", formData.category);
+      data.append("description", formData.description);
+      data.append("stock", formData.stock);
+      data.append("discount", formData.discount);
+      data.append("isFeatured", formData.isFeatured);
+      formData.tags.forEach((tag) => data.append("tags[]", tag.trim()));
+
+      if (formData.image instanceof File) {
+        data.append("image", formData.image);
       } else {
-        formData.append("image", formData.image); // Optional: for handling existing image URLs
+        data.append("image", formData.image);
       }
 
-  
-      // Append all other fields to formData (or as raw JSON if image is a URL)
-      Object.entries(updatedData).forEach(([key, value]) => {
-        if (key !== 'image' || isFile) {
-          formData.append(key, value);
-        }
+      await api.put(`/products/update/${id}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
-  
-      await api.put(
-        `/products/update/${id}`,
-        isFile ? formData : updatedData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ...(isFile && { 'Content-Type': 'multipart/form-data' }),
-          },
-        }
-      );
-  
+
       navigate('/vendors/dashboard');
     } catch (err) {
       console.error('Update Product Error:', err);
+    }finally {
+      setLoading(false); // Set loading to false when the API request completes
     }
   };
-  
 
-  if (loading) return <p className="text-center mt-10">Loading product...</p>;
 
   return (
     <div className="max-w-xl mx-auto mt-10">
+      {loading && <Loader2 />}
       <h2 className="text-2xl font-bold mb-4 text-green-800">✏️ Edit Product</h2>
-      <ProductForm initialData={initialData} onSubmit={handleUpdateProduct} />
+      <ProductForm initialData={initialData} onSubmit={handleUpdateProduct}  mode="edit" />
     </div>
   );
 };

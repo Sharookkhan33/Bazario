@@ -1,5 +1,5 @@
 const express = require("express");
-const productUpload = require("../middlewares/productUploads");
+const fileUpload = require("../middlewares/fileUpload");
 const {
   addProduct,
   getAllProducts,
@@ -24,8 +24,8 @@ router.get("/all",getAllProducts);
 
 
 // Vendor Routes
-router.post("/add", verifyVendor, productUpload.single("image"), addProduct);
-router.put('/update/:id', verifyVendor, productUpload.single("image"), updateProduct);
+router.post("/add", verifyVendor, fileUpload("product").single("image"), addProduct);
+router.put('/update/:id', verifyVendor, fileUpload("product").single("image"), updateProduct);
 router.get("/vendor", verifyVendor, getVendorProducts);
 router.delete("/delete/:id", verifyVendor, deleteProduct);
 

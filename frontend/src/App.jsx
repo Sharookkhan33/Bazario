@@ -30,7 +30,21 @@ import AdminVendorManagement from './pages/Admin/AdminVendorMangement';
 import AdminUserManagement from './pages/Admin/AdminUserManagement';
 import PublicRoute from './routes/PublicRoute';
 import AdminProductManagement from './pages/Admin/ProductManagement';
-import AdminOrderManagement from './pages/Admin/AdminOrderMAngement';
+import AdminOrderManagement from './pages/Admin/AdminOrders';
+import AdminBannerManagement from './pages/Admin/AdminBannerManagement';
+import AdminCategoryManagement from './pages/Admin/AdminCategoryManagement';
+import MyAccount from './pages/User/MyAccount';
+import CartPage from './pages/User/CartPage';
+import WishlistPage from './pages/User/WishlistPage';
+import ProductsByCategoryPage from './pages/ProductsByCategoryPage';
+import ProductDetailsPage from './pages/ProductDetailsPage';
+import ProductPage from './pages/User/HandleBuyNowPage';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailed from './pages/PaymentFailed';
+import LandingPage from './pages/LandingPage';
+import VendorLandingPage from './pages/VendorLandingPage';
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
 
 const App = () => {
   return (
@@ -38,16 +52,23 @@ const App = () => {
 
       <Routes>
 
-        <Route path="/" element={<><Navbar /><HomePage /></>}/>
+        <Route path="/home" element={<><Navbar /><PublicRoute/><HomePage /></>}/>
         <Route path="/login" element={<><Navbar /><PublicRoute/><UserLogin /></>}/>
-        <Route path="/register"element={<><Navbar /><UserRegister /></>}/>
+        <Route path="/register"element={<><Navbar /><PublicRoute/><UserRegister /></>}/>
         <Route path="/vendor-login" element={<><Navbar /><PublicRoute/><VendorLogin/> </>} />
-        <Route path="/vendor-register" element={<><Navbar /><VendorRegister/> </>} />
-        <Route path="/vendor/success" element={<><Navbar /><VendorSuccess/> </>} />
+        <Route path="/vendor-register" element={<><Navbar /><PublicRoute/><VendorRegister/> </>} />
+        <Route path="/vendor/success" element={<><Navbar /><PublicRoute/><VendorSuccess/> </>} />
         <Route path="/admin-register" element={<><Navbar/><AdminRegister /></>} />
         <Route path="/admin-verify" element={<><Navbar/><AdminVerify /></>} />
         <Route path="/admin-login" element={<><Navbar/><AdminLogin /></>} />
         <Route path="/vendor-rejected" element={<VendorRejected />} />
+        <Route path="/products" element={<><Navbar /><PublicRoute/><ProductsByCategoryPage/> </>} />
+        <Route path="/product/:id" element={<><Navbar /><PublicRoute/><ProductDetailsPage/> </>} />
+        <Route path="/" element={<><PublicRoute/><LandingPage /></>} />
+        <Route path="/vendor-home" element={<><PublicRoute/><VendorLandingPage/></>}/>
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<ContactUs />} />
+
 
 
         {/* Protected Vendor Panel routes */}
@@ -69,14 +90,20 @@ const App = () => {
             <Route path="/admin-users" element={<AdminUserManagement/>}/>
             <Route path="/admin-products" element={<AdminProductManagement/>}/>
             <Route path="/admin-orders" element={<AdminOrderManagement/>}/>
+            <Route path="/admin-banners" element={<AdminBannerManagement />} />
+            <Route path="/admin-categories" element={<AdminCategoryManagement />} />
 
           </Route>
         </Route>
         
         <Route element={<UserRoute />}>
         <Route element={<UserLayout />}>
-        
-        
+            <Route path="/my-account" element={<MyAccount/>} />
+            <Route path="/my-cart" element={<CartPage/>} />
+            <Route path="/my-wishlist" element={<WishlistPage/>} />
+            <Route path="/checkout" element={<ProductPage/>} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-failed" element={<PaymentFailed />} />
         </Route>
       </Route>
       </Routes>

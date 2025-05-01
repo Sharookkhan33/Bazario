@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import api from "../api/axios";
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import bgImage from '../assets/bg-image.png';
 
 const UserRegister = () => {
   const [formData, setFormData] = useState({
@@ -11,9 +12,10 @@ const UserRegister = () => {
     password: '',
     confirmPassword: ''
   });
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // ✅ Auth context
+  const { login } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -21,6 +23,11 @@ const UserRegister = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (!agreeTerms) {
+      alert("You must agree to the Terms and Conditions.");
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");
@@ -30,10 +37,10 @@ const UserRegister = () => {
     try {
       const response = await api.post('/users/register', formData);
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userType', 'user'); // optional
-      login(response.data.token,'user'); // ✅ update auth context
+      localStorage.setItem('userType', 'user');
+      login(response.data.token, 'user');
       alert("Registration successful!");
-      navigate('/'); // redirect to home
+      navigate('/home');
     } catch (error) {
       console.error("Registration failed:", error);
       alert(error.response?.data?.message || "Something went wrong.");
@@ -41,9 +48,12 @@ const UserRegister = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white p-6 rounded shadow-md">
-        <h2 className="text-2xl font-bold mb-4 text-center">User Registration</h2>
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center px-4"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
+      <div className="w-full max-w-md bg-white/50 backdrop-blur-xl p-8 rounded-2xl shadow-xl animate-in fade-in duration-500">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Hello! Welcome..</h2>
         <form onSubmit={handleRegister} className="space-y-4">
           <input
             type="text"
@@ -51,7 +61,7 @@ const UserRegister = () => {
             placeholder="Full Name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
           <input
@@ -60,7 +70,7 @@ const UserRegister = () => {
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
           <input
@@ -69,7 +79,7 @@ const UserRegister = () => {
             placeholder="Phone Number"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
           <input
@@ -78,7 +88,7 @@ const UserRegister = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
           <input
@@ -87,19 +97,32 @@ const UserRegister = () => {
             placeholder="Confirm Password"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
             required
           />
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={agreeTerms}
+              onChange={() => setAgreeTerms(!agreeTerms)}
+              className="w-4 h-4"
+              required
+            />
+            <label htmlFor="terms" className="text-sm text-gray-700">
+              I agree to the <a href="#" className="text-blue-600 hover:underline">Terms and Conditions</a>
+            </label>
+          </div>
           <button
             type="submit"
-            className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
           >
             Register
           </button>
         </form>
-        <p className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Already have an account?{' '}
+          <Link to="/login" className="text-blue-600 font-medium hover:underline">
             Login
           </Link>
         </p>

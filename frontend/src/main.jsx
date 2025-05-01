@@ -2,16 +2,23 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import { ThemeProvider } from "@material-tailwind/react";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import store from './store';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter> 
-      <AuthProvider>
+    <ThemeProvider>
+    <Provider store={store}>
+      <AuthProvider >
         <App />
         <ToastContainer position="bottom-right"  />
         <Toaster
@@ -43,6 +50,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 />
 
       </AuthProvider>
+      </Provider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

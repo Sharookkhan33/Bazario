@@ -76,3 +76,13 @@
     }
 }
   
+/* Make sure dropdown is above other content */
+
+body {
+  @apply transition-colors duration-500 bg-white text-black dark:bg-gray-900 dark:text-white;
+}
+
+.dialog-container {
+  @apply fixed inset-0 flex items-center justify-center z-50;
+}
+

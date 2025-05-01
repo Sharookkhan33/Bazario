@@ -9,16 +9,16 @@ const {
   getVendorProfile,
   getVendorDashboard
 } = require("../controllers/vendorController");
-const profileUpload = require("../middlewares/profileUploads");
+const fileUpload = require("../middlewares/fileUpload");
 const { verifyVendor } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-router.post("/register", profileUpload.single("profilePhoto"), registerVendor);
+router.post("/register", fileUpload("profile").single("profilePhoto"), registerVendor);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-otp", resendEmailOTP);
 router.post("/login", loginVendor);
-router.put("/update", profileUpload.single("profilePhoto"), verifyVendor, updateVendor);
+router.put("/update", fileUpload("profile").single("profilePhoto"), verifyVendor, updateVendor);
 router.get("/profile", verifyVendor, getVendorProfile);
 router.get("/dashboard", verifyVendor, getVendorDashboard);
 router.put("/status", verifyVendor, toggleVendorStatus);

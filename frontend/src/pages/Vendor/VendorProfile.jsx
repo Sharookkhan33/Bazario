@@ -54,7 +54,7 @@ const VendorProfile = () => {
 
       <div className="flex items-center mb-8">
         <img
-          src={`http://localhost:5000/${vendor.profilePhoto}`}
+          src={vendor.profilePhoto}
           alt="Profile"
           className="w-32 h-32 rounded-full border-4 border-blue-300 shadow-lg"
         />

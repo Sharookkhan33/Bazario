@@ -1,9 +1,12 @@
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
+const {uploadToCloudinary} = require("./cloudinaryUpload");
 
-const generateInvoice = (order, payment, filepath) => {
+const generateInvoice = (order, payment) => {
   return new Promise((resolve, reject) => {
+    const filename = `invoice-${order._id}.pdf`;
+    const filepath = path.join(__dirname, "../temp", filename);
     const doc = new PDFDocument();
     const stream = fs.createWriteStream(filepath);
 
@@ -27,9 +30,19 @@ const generateInvoice = (order, payment, filepath) => {
 
     doc.end();
 
-    stream.on("finish", () => resolve(filepath));
-    stream.on("error", (err) => reject(err));
+    stream.on("finish", async () => {
+      try {
+        // Organize Cloudinary folder structure
+        const cloudUrl = await uploadToCloudinary(filepath, `invoices/${order._id}`, "raw");
+        resolve(cloudUrl); // Send Cloudinary URL back
+      } catch (error) {
+        reject(error); // Catch and forward Cloudinary upload error
+      }
+    });
+
+    stream.on("error", (err) => reject(err)); // Catch errors in PDF creation
   });
 };
+
 
 module.exports = generateInvoice;

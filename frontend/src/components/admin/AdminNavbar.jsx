@@ -14,6 +14,8 @@ const AdminNavbar = () => {
         <Link to="/admin-vendors" className="hover:text-yellow-300">Vendors</Link>
         <Link to="/admin-products" className="hover:text-yellow-300">Products</Link>
         <Link to="/admin-orders" className="hover:text-yellow-300">Orders</Link>
+        <Link to="/admin-banners" className="hover:text-yellow-300">Banners</Link>
+        <Link to="/admin-categories" className="hover:text-yellow-300">Categories</Link>
         <button onClick={() => {
           localStorage.clear();
           window.location.href = '/vendor-login';

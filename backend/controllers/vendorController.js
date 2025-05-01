@@ -1,48 +1,70 @@
 const Vendor = require("../models/Vendor");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const {uploadToCloudinary} = require("../utils/cloudinaryUpload");
 const { generateOTP, sendVerificationEmail } = require("../services/emailService");
 const { comparePassword } = require("../utils/hash");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const path = require("path");
 // Register Vendor
 exports.registerVendor = async (req, res) => {
   try {
-    const { name, email, phone, password,businessName,businessAddress,gstNumber, bankDetails, documents } = req.body;
-    const profilePhoto = req.file ? req.file.path : "";
+    const {
+      name,
+      email,
+      phone,
+      password,
+      businessName,
+      businessAddress,
+      gstNumber,
+      bankDetails,
+      documents,
+    } = req.body;
 
-       // Check if Vendor already exists
-        const existingVendor = await Vendor.findOne({ email });
-        if (existingVendor) return res.status(400).json({ message: "Vendor already registered" });
-    
-        // Generate OTP
-      const emailOTP = generateOTP();
+    // Check if vendor already exists
+    const existingVendor = await Vendor.findOne({ email });
+    if (existingVendor) return res.status(400).json({ message: "Vendor already registered" });
 
-      const newVendor = new Vendor({
+    // Generate OTP
+    const emailOTP = generateOTP();
+
+    // Upload profile photo if provided
+    let profilePhoto = null;
+    if (req.file) {
+      const cloudinaryUrl = await uploadToCloudinary(req.file.path, "marketplace/profiles");
+      profilePhoto = cloudinaryUrl;
+    }
+
+    const newVendor = new Vendor({
       name,
       email,
       phone,
       password,
       emailOTP,
       emailVerified: false,
-      isVerified:false,
+      isVerified: false,
       businessName,
       businessAddress,
       gstNumber,
       bankDetails,
       documents,
       profilePhoto,
-      status: "pending", // Default status is pending
+      status: "pending",
     });
+
     await newVendor.save();
     await sendVerificationEmail(email, emailOTP);
-    const token = jwt.sign({ id: newVendor._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    res.status(201).json({ message: "OTP sent to email"});
+
+    const token = jwt.sign({ id: newVendor._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.status(201).json({ message: "OTP sent to email" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 exports.verifyEmail = async (req, res) => {
@@ -148,12 +170,10 @@ exports.updateVendor = async (req, res) => {
     };
 
     // ✅ Save profile photo path from "uploads/profiles"
-    if (req.file) {
-      const filename = req.file.filename;
-      const photoPath = path.join('uploads/profiles', filename).replace(/\\/g, '/');
-      updates.profilePhoto = photoPath;
+       if (req.file) {
+      const cloudinaryUrl = await uploadToCloudinary(req.file.path, "marketplace/profiles");
+      updates.profilePhoto = cloudinaryUrl;
     }
-
     const updatedVendor = await Vendor.findByIdAndUpdate(vendorId, updates, {
       new: true,
       runValidators: true,

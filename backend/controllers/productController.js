@@ -1,6 +1,6 @@
 const Product = require("../models/Product");
 const mongoose = require("mongoose");
-
+const {uploadToCloudinary} = require("../utils/cloudinaryUpload");
 
 // Add a new product
 exports.addProduct = async (req, res) => {
@@ -8,7 +8,8 @@ exports.addProduct = async (req, res) => {
     let image;
 
     if (req.file) {
-      image = `${req.protocol}://${req.get("host")}/uploads/products/${req.file.filename}`;
+      const cloudinaryUrl = await uploadToCloudinary(req.file.path, "marketplace/products");
+      image = cloudinaryUrl;
     } else if (req.body.image) {
       image = req.body.image;
     } else {
@@ -117,8 +118,9 @@ exports.updateProduct = async (req, res) => {
     if (!product) return res.status(404).json({ message: "Product not found or unauthorized" });
 
     // Handle image if new one is uploaded
-    if (req.file) {
-      req.body.image = `${req.protocol}://${req.get("host")}/uploads/products/${req.file.filename}`;
+     if (req.file) {
+      const cloudinaryUrl = await uploadToCloudinary(req.file.path, "marketplace/products");
+      req.body.image = cloudinaryUrl;
     }
 
     Object.assign(product, req.body);
@@ -176,32 +178,75 @@ exports.deleteProduct = async (req, res) => {
     }
   };
   //search and filtering
-  exports.searchProducts = async (req, res) => {
-    try {
-      const { search, category, minPrice, maxPrice, averageRating } = req.query;
-      const query = {};
-  
-      if (search) {
-        query.name = { $regex: search, $options: "i" };
-      }
-      if (category) {
-        query.category = category;
-      }
-      if (minPrice || maxPrice) {
-        query.price = {};
-        if (minPrice) query.price.$gte = Number(minPrice);
-        if (maxPrice) query.price.$lte = Number(maxPrice);
-      }
-      if (averageRating) {
-        query.averageRating = { $gte: Number(averageRating) };
-      }
-  
-      const products = await Product.find(query);
-      res.status(200).json(products);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  // controllers/productController.js
+// in controllers/productController.js
+
+// controllers/productController.js
+
+exports.searchProducts = async (req, res) => {
+  try {
+    let {
+      search = "",
+      categories,       // this will come from query
+      minPrice,
+      maxPrice,
+      averageRating,
+      sort,
+    } = req.query;
+
+    search = search.trim().toLowerCase();
+    const query = {};
+
+    // Search part
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // safe regex
+      query.name = { $regex: escaped, $options: "i" };
     }
-  };                
+
+    // Category filtering part
+    if (categories) {
+      // If multiple categories: "Men Fashion,Women Fashion"
+      query.category = { $in: categories.split(",") };
+    }
+
+    // Price filtering part
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = +minPrice;
+      if (maxPrice) query.price.$lte = +maxPrice;
+    }
+
+    // Rating filtering
+    if (averageRating) {
+      query.averageRating = { $gte: +averageRating };
+    }
+
+    let mongoQuery = Product.find(query);
+
+    // Sorting
+    if (sort) {
+      const [field, dir] = sort.split("_");
+      const order = dir === "asc" ? 1 : -1;
+      const map = {
+        price: "price",
+        rating: "averageRating",
+        discount: "discount",
+        sold: "sold",
+      };
+      if (map[field]) {
+        mongoQuery = mongoQuery.sort({ [map[field]]: order });
+      }
+    }
+
+    const products = await mongoQuery.exec();
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+               
   exports.getAllProductsForAdmin = async (req, res) => {
     try {
       const { status, isActive, category, vendor, search } = req.query;
