@@ -11,7 +11,7 @@ import { AuthProvider } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import store from './store';
+import store from './Store';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
