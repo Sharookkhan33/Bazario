@@ -23,7 +23,7 @@ const app =express();
 
 
 app.use(cors({
-    origin: 'http://localhost:5173', // 👈 specify your frontend URL
+    origin: 'https://bazario-theta.vercel.app', // 👈 specify your frontend URL
     credentials: true,               // 👈 allow credentials (cookies, auth headers)
   }));
 app.use(express.json())
