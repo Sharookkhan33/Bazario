@@ -14,7 +14,6 @@ import "react-toastify/dist/ReactToastify.css";
 import store from './Store';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
     <BrowserRouter> 
     <ThemeProvider>
     <Provider store={store}>
@@ -53,5 +52,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </Provider>
       </ThemeProvider>
     </BrowserRouter>
-  </React.StrictMode>
 );
