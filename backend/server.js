@@ -23,7 +23,7 @@ const app =express();
 
 
 app.use(cors({
-    origin: 'https://bazario-theta.vercel.app', // 👈 specify your frontend URL
+    origin: 'https://bazario-git-main-mohammed-sharook-khan-s-ss-projects.vercel.app/', // 👈 specify your frontend URL
     credentials: true,               // 👈 allow credentials (cookies, auth headers)
   }));
 app.use(express.json())

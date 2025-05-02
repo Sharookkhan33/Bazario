@@ -13,7 +13,7 @@ const PublicRoute = ({ children }) => {
       case 'admin':
         return <Navigate to="/admin/dashboard" replace />;
       default:
-        return <Navigate to="/home" replace />;
+        return <Navigate to="/" replace />;
     }
   }
 
