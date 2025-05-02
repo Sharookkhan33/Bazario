@@ -23,9 +23,12 @@ const app =express();
 
 
 app.use(cors({
-    origin: 'https://bazario-git-main-mohammed-sharook-khan-s-ss-projects.vercel.app/', // 👈 specify your frontend URL
-    credentials: true,               // 👈 allow credentials (cookies, auth headers)
-  }));
+  origin: [
+    'http://localhost:5173', // local dev
+    'https://bazario-git-main-mohammed-sharook-khan-s-ss-projects.vercel.app/' // your deployed frontend domain
+  ],
+  credentials: true
+}));
 app.use(express.json())
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/invoices", express.static(path.join(__dirname, "invoices")));
