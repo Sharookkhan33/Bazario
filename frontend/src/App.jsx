@@ -53,8 +53,8 @@ const App = () => {
       <Routes>
 
         <Route path="/home" element={<><Navbar /><HomePage /></>}/>
-        <Route path="/login" element={<><Navbar /><PublicRoute/><UserLogin /></>}/>
-        <Route path="/register"element={<><Navbar /><PublicRoute/><UserRegister /></>}/>
+        <Route path="/login" element={<><Navbar /><UserLogin /></>}/>
+        <Route path="/register"element={<><Navbar /><UserRegister /></>}/>
         <Route path="/vendor-login" element={<><Navbar /><PublicRoute/><VendorLogin/> </>} />
         <Route path="/vendor-register" element={<><Navbar /><PublicRoute/><VendorRegister/> </>} />
         <Route path="/vendor/success" element={<><Navbar /><PublicRoute/><VendorSuccess/> </>} />
