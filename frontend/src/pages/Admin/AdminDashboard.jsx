@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
-import Card from "@/components/ui/card";
+import Card from "../../components/ui/Card";
 import {
   PieChart,
   Pie,
@@ -51,13 +51,13 @@ const AdminDashboard = () => {
   }, []);
 
   const stats = [
-    { title: "Total Users", value: data.totalUsers, color: "bg-blue-800" },
-    { title: "Total Vendors", value: data.totalVendors, color: "bg-green-900" },
+    { title: "Total Users", value: data.totalUsers, color: "bg-blue-600" },
+    { title: "Total Vendors", value: data.totalVendors, color: "bg-green-600" },
     { title: "Total Orders", value: data.totalOrders, color: "bg-yellow-500" },
     {
       title: "Total Earnings",
       value: `₹${formatCurrency(data.totalEarnings)}`,
-      color: "bg-purple-700"
+      color: "bg-purple-600"
     }
     
   ];

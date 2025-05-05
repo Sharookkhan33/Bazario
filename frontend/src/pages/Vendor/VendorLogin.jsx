@@ -14,23 +14,31 @@ const VendorLogin = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  const handleVendorLogin = async (e) => {
+  const handleVendorLogin = async (e) => { 
     e.preventDefault();
     try {
       const response = await api.post('/vendors/login', {
         email,
         password,
       });
+  
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userType', 'vendor'); // 👈 add thisT
-      login(response.data.token, 'vendor'); // ✅ pass token AND userType
-      toast.success("Loggin Successul")
-      navigate('/vendors/dashboard', { replace: true });// Adjust this route based on your app
+      localStorage.setItem('userType', 'vendor');
+      login(response.data.token, 'vendor');
+  
+      toast.success("Login Successful");
+      navigate('/vendors/dashboard', { replace: true });
+  
     } catch (error) {
-      toast.error('Login failed', error);
-      toast.error('Login failed. Please check your credentials.',err);
+      if (error.response && error.response.status === 403) {
+        toast.error('Your account has been rejected.');
+        navigate('/vendor-rejected', { replace: true });
+      } else {
+        toast.error('Login failed. Please check your credentials.');
+      }
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4">
