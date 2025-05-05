@@ -1,29 +1,80 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FaBars, FaTimes } from "react-icons/fa";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/admin-login');
+  };
+
   return (
-    <nav className="bg-blue-900 text-white flex justify-between items-center px-6 py-3 sticky top-0 z-50">
-      <div className="text-xl font-bold">Admin Panel</div>
-      <div className="space-x-4">
-        <Link to="/admin-dashboard" className="hover:text-yellow-300">Dashboard</Link>
-        <Link to="/admin-users" className="hover:text-yellow-300">Users</Link>
-        <Link to="/admin-vendors" className="hover:text-yellow-300">Vendors</Link>
-        <Link to="/admin-products" className="hover:text-yellow-300">Products</Link>
-        <Link to="/admin-orders" className="hover:text-yellow-300">Orders</Link>
-        <Link to="/admin-banners" className="hover:text-yellow-300">Banners</Link>
-        <Link to="/admin-categories" className="hover:text-yellow-300">Categories</Link>
-        <button onClick={() => {
-          localStorage.clear();
-          window.location.href = '/vendor-login';
-        }} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
-          Logout
+    <>
+      <nav className="bg-blue-900 text-white flex justify-between items-center px-6 py-4 sticky top-0 z-50">
+        <div className="text-2xl font-extrabold">Admin Panel</div>
+        <div className="hidden md:flex space-x-6 items-center">
+          {['dashboard', 'users', 'vendors', 'products', 'orders', 'banners', 'categories'].map((path) => (
+            <Link
+              key={path}
+              to={`/admin-${path}`}
+              className="hover:text-yellow-300 transition-colors duration-200"
+            >
+              {path.charAt(0).toUpperCase() + path.slice(1)}
+            </Link>
+          ))}
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200"
+          >
+            Logout
+          </button>
+        </div>
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden text-2xl"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
+      </nav>
+
+      {/* Mobile Sidebar */}
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-blue-900 text-white transform transition-transform duration-300 z-40
+          ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        <div className="flex flex-col mt-16 space-y-6 px-6">
+          {['dashboard', 'users', 'vendors', 'products', 'orders', 'banners', 'categories'].map((path) => (
+            <Link
+              key={path}
+              to={`/admin-${path}`}
+              onClick={() => setMenuOpen(false)}
+              className="block text-lg hover:text-yellow-300 transition-colors duration-200"
+            >
+              {path.charAt(0).toUpperCase() + path.slice(1)}
+            </Link>
+          ))}
+          <button
+            onClick={handleLogout}
+            className="mt-4 bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200"
+          >
+            Logout
+          </button>
+        </div>
       </div>
-    </nav>
+
+      {/* Overlay when sidebar is open */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+    </>
   );
 };
 

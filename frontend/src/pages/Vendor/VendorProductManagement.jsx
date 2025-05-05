@@ -29,7 +29,7 @@ const VendorProductManagement = () => {
       await api.delete(`/products/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProducts(prev => prev.filter(p => p._id !== id));
+      setProducts((prev) => prev.filter((p) => p._id !== id));
       alert("Product deleted successfully");
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -42,7 +42,11 @@ const VendorProductManagement = () => {
       const res = await api.put(`/products/toggle-status/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProducts(prev => prev.map(p => p._id === id ? { ...p, isActive: res.data.product.isActive } : p));
+      setProducts((prev) =>
+        prev.map((p) =>
+          p._id === id ? { ...p, isActive: res.data.product.isActive } : p
+        )
+      );
     } catch (error) {
       console.error("Failed to toggle status:", error);
       alert("Failed to update product status");
@@ -52,12 +56,13 @@ const VendorProductManagement = () => {
   const handleAddProduct = () => navigate("/vendors/add-product");
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Your Products</h2>
+    <div className="pt-20 p-6 bg-gray-100 min-h-screen">
+
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">🛍️ Your Products</h2>
         <button
           onClick={handleAddProduct}
-          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow transition"
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow-md transition"
         >
           ➕ Add Product
         </button>
@@ -65,29 +70,41 @@ const VendorProductManagement = () => {
 
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {products.length === 0 ? (
-          <p className="col-span-full text-center text-gray-500">No products found.</p>
+          <p className="col-span-full text-center text-gray-500 text-lg">
+            No products found.
+          </p>
         ) : (
-          products.map(product => (
+          products.map((product) => (
             <div
               key={product._id}
-              className="bg-white rounded-2xl shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition flex flex-col"
+              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-transform transform hover:-translate-y-1 flex flex-col overflow-hidden"
             >
-              <div className="h-48 w-full overflow-hidden rounded-t-2xl">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-4 flex flex-col flex-grow">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">{product.name}</h3>
-                <p className="text-indigo-600 font-bold">₹{product.price}</p>
-                <p className="text-gray-600 text-sm mt-1">Stock: {product.stock}</p>
+              <div className="aspect-[4/3] w-full overflow-hidden rounded-t-2xl bg-gray-100">
+  <img
+    src={product.image}
+    alt={product.name}
+    className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+  />
+</div>
 
-                <div className="mt-auto pt-4 flex items-center justify-between">
-                  <span className={`px-3 py-1 text-sm font-medium rounded-full ${product.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {product.isActive ? 'Active' : 'Inactive'}
+              <div className="p-4 flex flex-col flex-grow">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
+                  {product.name}
+                </h3>
+                <p className="text-indigo-600 font-bold text-sm sm:text-base">₹{product.price}</p>
+                <p className="text-gray-600 text-sm mt-1 mb-2">Stock: {product.stock}</p>
+
+                <div className="mt-auto flex items-center justify-between pt-2">
+                  <span
+                    className={`px-3 py-1 text-sm font-medium rounded-full ${
+                      product.isActive
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {product.isActive ? "Active" : "Inactive"}
                   </span>
+
                   {/* Toggle Switch */}
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -95,23 +112,23 @@ const VendorProductManagement = () => {
                       className="sr-only peer"
                       checked={product.isActive}
                       onChange={() => handleToggleStatus(product._id)}
-                      aria-label={product.isActive ? 'Deactivate product' : 'Activate product'}
+                      aria-label={product.isActive ? "Deactivate product" : "Activate product"}
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
                     <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
                   </label>
                 </div>
 
-                <div className="mt-4 flex space-x-4">
+                <div className="mt-4 flex space-x-3">
                   <button
                     onClick={() => handleEdit(product._id)}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg text-center transition"
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm py-2 rounded-lg text-center transition"
                   >
                     ✏️ Edit
                   </button>
                   <button
                     onClick={() => handleDelete(product._id)}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-center transition"
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm py-2 rounded-lg text-center transition"
                   >
                     🗑️ Delete
                   </button>

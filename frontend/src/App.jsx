@@ -53,6 +53,7 @@ const App = () => {
       <Routes>
 
         <Route path="/home" element={<><Navbar /><HomePage /></>}/>
+        <Route path="/products" element={<><Navbar/><HomePage/></>} />
         <Route path="/login" element={<><Navbar /><UserLogin /></>}/>
         <Route path="/register"element={<><Navbar /><UserRegister /></>}/>
         <Route path="/vendor-login" element={<><Navbar /><PublicRoute/><VendorLogin/> </>} />
@@ -60,11 +61,11 @@ const App = () => {
         <Route path="/vendor/success" element={<><Navbar /><PublicRoute/><VendorSuccess/> </>} />
         <Route path="/admin-register" element={<><Navbar/><AdminRegister /></>} />
         <Route path="/admin-verify" element={<><Navbar/><AdminVerify /></>} />
-        <Route path="/admin-login" element={<><Navbar/><AdminLogin /></>} />
+        <Route path="/admin-login" element={<><Navbar/><PublicRoute/><AdminLogin /></>} />
         <Route path="/vendor-rejected" element={<VendorRejected />} />
-        <Route path="/products" element={<><Navbar /><ProductsByCategoryPage/> </>} />
+        <Route path="/product" element={<><Navbar /><ProductsByCategoryPage/></>} />
         <Route path="/product/:id" element={<><Navbar /><ProductDetailsPage/> </>} />
-        <Route path="/" element={<><PublicRoute/><LandingPage /></>} />
+        <Route path="/" element={<><LandingPage /></>} />
         <Route path="/vendor-home" element={<><PublicRoute/><VendorLandingPage/></>}/>
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<ContactUs />} />

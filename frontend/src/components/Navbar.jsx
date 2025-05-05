@@ -74,7 +74,7 @@ useEffect(() => {
     if (q) {
       const queryParams = new URLSearchParams(filters);
       queryParams.set('search', q);
-      navigate(`/?${queryParams.toString()}`);
+      navigate(`/products?${queryParams.toString()}`);
       setSearchTerm('');
     }
   };
@@ -82,7 +82,7 @@ useEffect(() => {
   const handleApplyFilters = () => {
     const queryParams = new URLSearchParams(filters);
     if (qs.get('search')) queryParams.set('search', qs.get('search'));
-    navigate(`/?${queryParams.toString()}`);
+    navigate(`/products?${queryParams.toString()}`);
     setShowFilters(false);
   };
 

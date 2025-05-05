@@ -16,7 +16,6 @@ const AdminBannerManagement = () => {
   const [banners, setBanners] = useState([]);
   const [formData, setFormData] = useState(initialBannerForm);
   const [editingId, setEditingId] = useState(null);
-
   const formRef = useRef();
 
   const fetchBanners = async () => {
@@ -49,16 +48,12 @@ const AdminBannerManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData();
-
     fd.append("title", formData.title);
     fd.append("subtitle", formData.subtitle);
     fd.append("link", formData.link);
     fd.append("isActive", formData.isActive);
-    if (formData.file) {
-      fd.append("image", formData.file);
-    } else {
-      fd.append("image", formData.image);
-    }
+    if (formData.file) fd.append("image", formData.file);
+    else fd.append("image", formData.image);
 
     try {
       if (editingId) {
@@ -81,40 +76,39 @@ const AdminBannerManagement = () => {
 
       setFormData(initialBannerForm);
       setEditingId(null);
+      formRef.current?.reset();
       fetchBanners();
     } catch (err) {
       console.error("Failed to save banner:", err);
       toast.error("Failed to save banner");
     }
   };
+
   const toggleBannerStatus = async (id, newStatus) => {
     try {
       await api.put(
         `/banners/status/${id}`,
         { isActive: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
-      toast.success(`Banner ${newStatus ? "activated" : "deactivated"}!`);
+      toast.success(
+        `Banner ${newStatus ? "activated" : "deactivated"}!`
+      );
       fetchBanners();
     } catch (err) {
       console.error("Status toggle failed:", err);
       toast.error("Failed to update banner status.");
     }
   };
-  
+
   const handleEdit = (banner) => {
     setEditingId(banner._id);
     setFormData({ ...banner, file: null });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  
+
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this banner?")) return;
-
     try {
       await api.delete(`/banners/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -129,26 +123,28 @@ const AdminBannerManagement = () => {
 
   return (
     <div className="p-6 max-w-screen-xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-blue-800">Banner Management</h1>
+      <h1 className="text-3xl font-extrabold mb-6 text-blue-800 text-center">
+        Banner Management
+      </h1>
 
       {/* Banner Form */}
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow mb-10 space-y-4"
+        className="bg-white p-6 rounded-2xl shadow-lg mb-12 space-y-6"
       >
-        <h2 className="text-xl font-semibold mb-2">
+        <h2 className="text-2xl font-bold text-gray-900">
           {editingId ? "Edit Banner" : "Add New Banner"}
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
           <input
             type="text"
             name="title"
             value={formData.title}
             onChange={handleChange}
             placeholder="Title"
-            className="border px-4 py-2 rounded w-full"
+            className="border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"
           />
           <input
             type="text"
@@ -156,46 +152,52 @@ const AdminBannerManagement = () => {
             value={formData.subtitle}
             onChange={handleChange}
             placeholder="Subtitle"
-            className="border px-4 py-2 rounded w-full"
+            className="border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"
           />
           <input
-            type="text"
+            type="url"
             name="link"
             value={formData.link}
             onChange={handleChange}
             placeholder="Link (optional)"
-            className="border px-4 py-2 rounded w-full"
+            className="border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"
           />
           <input
-            type="text"
+            type="url"
             name="image"
             value={formData.image}
             onChange={handleChange}
             placeholder="Image URL (optional)"
-            className="border px-4 py-2 rounded w-full"
+            className="border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"
           />
-          <input
-            type="file"
-            name="file"
-            accept="image/*"
-            onChange={handleChange}
-            className="w-full"
-          />
-          <label className="flex items-center gap-2">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Upload Image
+            </label>
+            <input
+              type="file"
+              name="file"
+              accept="image/*"
+              onChange={handleChange}
+              className="w-full text-gray-600"
+            />
+          </div>
+          <label className="md:col-span-2 flex items-center gap-2 mt-2">
             <input
               type="checkbox"
               name="isActive"
               checked={formData.isActive}
               onChange={handleChange}
+              className="h-5 w-5 text-blue-600"
             />
-            <span>Active</span>
+            <span className="text-gray-700 font-medium">Active</span>
           </label>
         </div>
 
         <div className="text-right">
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition duration-200"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl shadow-md transition-transform transform hover:scale-105"
           >
             {editingId ? "Update Banner" : "Create Banner"}
           </button>
@@ -203,53 +205,62 @@ const AdminBannerManagement = () => {
       </form>
 
       {/* Banner List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {banners.map((banner) => (
           <div
             key={banner._id}
-            className="bg-white border shadow rounded-lg overflow-hidden relative group"
+            className="relative bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group"
           >
             <img
               src={banner.image}
               alt={banner.title || "Banner Image"}
               className="h-48 w-full object-cover"
             />
-            <div className="p-4 flex flex-col justify-between min-h-56">
-  <h3 className="text-lg font-semibold">{banner.title || "Untitled"}</h3>
-  <p className="text-sm text-gray-600">{banner.subtitle}</p>
+            <div className="p-4 space-y-2">
+              <h3 className="text-xl font-bold text-gray-900">
+                {banner.title || "Untitled"}
+              </h3>
+              <p className="text-gray-600">{banner.subtitle}</p>
               {banner.link && (
-                <p className="text-sm text-blue-500 break-words">{banner.link}</p>
+                <a
+                  href={banner.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 break-words hover:underline"
+                >
+                  {banner.link}
+                </a>
               )}
-              <p className="text-sm mt-1">
-                Status:{" "}
-                <span className={banner.isActive ? "text-green-600" : "text-red-500"}>
-                  {banner.isActive ? "Active" : "Inactive"}
+              <p className="text-sm">
+                Status:{' '}
+                <span
+                  className={
+                    banner.isActive ? 'text-green-600 font-semibold' : 'text-red-500 font-semibold'
+                  }
+                >
+                  {banner.isActive ? 'Active' : 'Inactive'}
                 </span>
               </p>
             </div>
-
-            {/* Fixed Buttons */}
-            <div className="absolute top-2 right-2 flex gap-2">
+            <div className="absolute top-2 right-2 flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-200 space-y-1">
               <button
                 onClick={() => handleEdit(banner)}
-                className="bg-yellow-400 hover:bg-yellow-500 text-sm px-3 py-1 rounded shadow"
+                className="bg-yellow-400 hover:bg-yellow-500 text-xs px-3 py-1 rounded-lg shadow"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(banner._id)}
-                className="bg-red-500 hover:bg-red-600 text-sm px-3 py-1 text-white rounded shadow"
+                className="bg-red-500 hover:bg-red-600 text-xs px-3 py-1 text-white rounded-lg shadow"
               >
                 Delete
               </button>
               <button
-  onClick={() => toggleBannerStatus(banner._id, !banner.isActive)}
-  className={`${
-    banner.isActive ? "text-yellow-500" : "text-green-600"
-  } hover:underline`}
->
-  {banner.isActive ? "Deactivate" : "Activate"}
-</button>
+                onClick={() => toggleBannerStatus(banner._id, !banner.isActive)}
+                className="text-xs hover:underline"
+              >
+                {banner.isActive ? 'Deactivate' : 'Activate'}
+              </button>
             </div>
           </div>
         ))}

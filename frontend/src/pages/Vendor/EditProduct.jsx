@@ -67,7 +67,7 @@ const EditProduct = () => {
 
 
   return (
-    <div className="max-w-xl mx-auto mt-10">
+   <div className="pt-20 p-6 bg-gray-100 min-h-screen max-w-xl mx-auto mt-10">
       {loading && <Loader2 />}
       <h2 className="text-2xl font-bold mb-4 text-green-800">✏️ Edit Product</h2>
       <ProductForm initialData={initialData} onSubmit={handleUpdateProduct}  mode="edit" />

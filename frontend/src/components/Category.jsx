@@ -18,7 +18,7 @@ const CategorySection = () => {
         <div
           key={cat._id}
           className="flex-shrink-0 cursor-pointer border rounded-lg p-3 text-center hover:shadow-md min-w-[120px]"
-          onClick={() => navigate(`/products?categories=${encodeURIComponent(cat.slug)}`)}
+          onClick={() => navigate(`/product?categories=${encodeURIComponent(cat.slug)}`)}
         >
           <img src={cat.image} alt={cat.name} className="w-16 h-16 mx-auto object-cover" />
           <h3 className="mt-2 font-semibold text-sm">{cat.name}</h3>

@@ -187,16 +187,25 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 //dash board
+
 exports.getAdminDashboard = async (req, res) => {
   try {
-    const totalUsers = await User.countDocuments();
-    const totalVendors = await Vendor.countDocuments();
-    const totalOrders = await Order.countDocuments();
+    // Total counts
+    const totalUsers    = await User.countDocuments();
+    const totalVendors  = await Vendor.countDocuments();
+    const totalOrders   = await Order.countDocuments();
+
+    // Earnings
     const totalPayments = await Payment.aggregate([
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
-
     const totalEarnings = totalPayments[0]?.total || 0;
+
+    // Pending counts
+    const pendingVendors  = await Vendor.countDocuments({ status: "pending" });
+    const pendingProducts = await Product.countDocuments({ status: "pending" });
+
+    // Orders grouped by month
     const orderTrends = await Order.aggregate([
       {
         $group: {
@@ -204,6 +213,22 @@ exports.getAdminDashboard = async (req, res) => {
           count: { $sum: 1 },
         },
       },
+      {
+        $project: {
+          month: {
+            $arrayElemAt: [
+              [
+                "Jan","Feb","Mar","Apr","May","Jun",
+                "Jul","Aug","Sep","Oct","Nov","Dec"
+              ],
+              { $subtract: ["$_id", 1] }
+            ]
+          },
+          count: 1,
+          _id: 0
+        }
+      },
+      { $sort: { month: 1 } }
     ]);
 
     res.status(200).json({
@@ -211,12 +236,16 @@ exports.getAdminDashboard = async (req, res) => {
       totalVendors,
       totalOrders,
       totalEarnings,
-      orderTrends,
+      pendingVendors,
+      pendingProducts,
+      ordersByMonth: orderTrends,
     });
   } catch (error) {
+    console.error("Admin dashboard error:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Suspend or unsuspend a user
 exports.toggleUserSuspension = async (req, res) => {

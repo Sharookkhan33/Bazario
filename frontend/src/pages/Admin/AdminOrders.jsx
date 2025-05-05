@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminOrderManagement = () => {
   const [orders, setOrders] = useState([]);
-  const [status, setStatus] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [earnings, setEarnings] = useState(null);
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/orders/all?status=${status}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const res = await api.get(`/orders/all?status=${statusFilter}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setOrders(res.data);
     } catch (err) {
@@ -27,9 +26,7 @@ const AdminOrderManagement = () => {
   const fetchEarnings = async () => {
     try {
       const res = await api.get("/admin/dashboard", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setEarnings(res.data.totalEarnings);
     } catch (err) {
@@ -42,44 +39,39 @@ const AdminOrderManagement = () => {
       await api.put(
         `/orders/update-status/${orderId}`,
         { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       fetchOrders();
       toast.success("Order status updated!");
     } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "Failed to update status";
-      toast.error(message);
+      const msg = error.response?.data?.message || "Failed to update status";
+      toast.error(msg);
     }
   };
 
   useEffect(() => {
     fetchOrders();
     fetchEarnings();
-  }, [status]);
+  }, [statusFilter]);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4 text-blue-700">Admin Order Management</h1>
+    <div className="p-6 max-w-screen-xl mx-auto">
+      <h1 className="text-3xl font-extrabold mb-6 text-blue-800 text-center">
+        Admin Order Management
+      </h1>
 
       {earnings !== null && (
-        <div className="mb-4 p-3 bg-green-100 border border-green-300 rounded text-green-800 font-semibold">
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 font-semibold text-center">
           💰 Total Earnings: ₹{earnings.toFixed(2)}
         </div>
       )}
 
-      <div className="mb-6">
-        <label className="font-medium mr-2">Filter by Status:</label>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+        <label className="font-medium text-gray-700">Filter by Status:</label>
         <select
-          className="p-2 border rounded"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
         >
           <option value="">All</option>
           <option value="pending">Pending</option>
@@ -91,34 +83,34 @@ const AdminOrderManagement = () => {
       </div>
 
       {loading ? (
-        <p className="text-gray-600">Loading orders...</p>
+        <p className="text-center text-gray-600">Loading orders...</p>
       ) : orders.length === 0 ? (
-        <p className="text-gray-500">No orders found.</p>
+        <p className="text-center text-gray-500">No orders found.</p>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
           {orders.map((order) => (
             <div
               key={order._id}
-              className="bg-white p-5 rounded-xl shadow border hover:shadow-md transition-shadow"
+              className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition-shadow duration-300 border border-gray-100"
             >
-              <div className="flex justify-between flex-col md:flex-row">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div>
                   <p className="font-semibold text-gray-800">
                     🧾 Order ID: <span className="text-blue-600">{order._id}</span>
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 mt-1">
                     Placed on: {new Date(order.createdAt).toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-500">
-                    By: {order.user?.email || "Unknown User"}
+                    By: {order.user?.email || "Unknown"}
                   </p>
                 </div>
-                <div className="mt-3 md:mt-0">
+                <div className="mt-4 md:mt-0">
                   <label className="text-sm font-medium text-gray-600 mr-2">Status:</label>
                   <select
                     value={order.status}
                     onChange={(e) => updateStatus(order._id, e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   >
                     <option value="pending">Pending</option>
                     <option value="processing">Processing</option>
@@ -130,29 +122,24 @@ const AdminOrderManagement = () => {
               </div>
 
               <div className="mt-4">
-                <p className="font-semibold text-gray-700">📦 Items:</p>
-                <ul className="ml-5 list-disc text-gray-600">
+                <p className="font-semibold text-gray-700 mb-1">📦 Items:</p>
+                <ul className="list-disc list-inside text-gray-600 space-y-1">
                   {order.items.map((item, idx) => (
-                    <li key={idx}>
-                      {item.name} × {item.quantity} = ₹{item.subtotal}
+                    <li key={idx} className="flex justify-between">
+                      <span>{item.name} × {item.quantity}</span>
+                      <span>₹{item.subtotal.toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="mt-4 flex flex-col md:flex-row justify-between items-center">
-                <p className="font-semibold text-lg">
+              <div className="mt-6 flex flex-col md:flex-row justify-between items-center">
+                <p className="font-bold text-lg text-gray-800">
                   Total: ₹{order.totalAmount.toFixed(2)}
                 </p>
-                <p
-                  className={`text-sm mt-2 md:mt-0 font-medium ${
-                    order.paymentStatus === "pending"
-                      ? "text-red-600"
-                      : "text-green-600"
-                  }`}
-                >
-                  Payment Status: {order.paymentStatus}
-                </p>
+                <span className={`mt-2 md:mt-0 font-medium text-sm ${order.paymentStatus === "pending" ? "text-red-600" : "text-green-600"}`}>
+                  Payment: {order.paymentStatus}
+                </span>
               </div>
             </div>
           ))}

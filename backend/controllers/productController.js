@@ -33,7 +33,11 @@ exports.addProduct = async (req, res) => {
 // Get all products
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate("vendor", "name email");
+    const products = await Product.find({ 
+      status: "approved", 
+      isActive: true,
+      stock: { $gt: 0 }  // stock greater than 0
+    }).populate("vendor", "name email");
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -176,18 +180,14 @@ exports.deleteProduct = async (req, res) => {
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
-  };
-  //search and filtering
-  // controllers/productController.js
-// in controllers/productController.js
+  }
 
 // controllers/productController.js
-
 exports.searchProducts = async (req, res) => {
   try {
     let {
       search = "",
-      categories,       // this will come from query
+      categories,
       minPrice,
       maxPrice,
       averageRating,
@@ -195,17 +195,20 @@ exports.searchProducts = async (req, res) => {
     } = req.query;
 
     search = search.trim().toLowerCase();
-    const query = {};
+    const query = {
+      status: "approved",
+      isActive: true,
+      stock: { $gt: 0 },
+    };
 
     // Search part
     if (search) {
-      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // safe regex
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       query.name = { $regex: escaped, $options: "i" };
     }
 
     // Category filtering part
     if (categories) {
-      // If multiple categories: "Men Fashion,Women Fashion"
       query.category = { $in: categories.split(",") };
     }
 
