@@ -99,12 +99,17 @@ useEffect(() => {
   return (
     <header className="sticky top-0 z-50 bg-white/80 shadow-md">
       <nav className="flex items-center justify-between px-4 py-3 md:px-8">
-        {/* Logo */}
-        <Link
+ {/* Logo */}
+<Link
   to="/home"
-  className="text-xl font-bold text-black transition-all duration-300 hover:text-blue-600 hover:scale-105"
+  className="flex items-center space-x-2 text-xl font-bold text-black transition-all duration-300 hover:text-blue-600 hover:scale-105"
 >
-  Bazario
+  <img
+    src="/favicon.ico"
+    alt="Bazario Logo"
+    className="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-105"
+  />
+  <span>Bazario</span>
 </Link>
 
 
